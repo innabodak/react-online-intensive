@@ -9,7 +9,7 @@ export default class Composer extends Component {
         const {
             avatar,
             currentUserFirstName,
-        } = this. props;
+        } = this.props;
 
         return (
             <section className = { Styles.composer }>
