@@ -6,7 +6,6 @@ import { Consumer } from 'components/HOC/withProfile';
 
 //Instruments
 import Styles from './styles.m.css';
-// import avatar from 'theme/assets/lisa';
 
 export default class StatusBar extends Component {
     render() {
