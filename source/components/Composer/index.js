@@ -76,4 +76,3 @@ export default class Composer extends Component {
     }
 }
 
-// export default withProfile(Composer);
