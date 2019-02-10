@@ -1,5 +1,7 @@
 // Core
 import React, { Component } from 'react';
+import { Transition } from 'react-transition-group';
+import { fromTo } from 'gsap';
 
 //Components
 import { withProfile } from 'components/HOC/withProfile';
@@ -8,17 +10,20 @@ import StatusBar from 'components/StatusBar';
 import Composer from 'components/Composer';
 import Post from 'components/Post';
 import Spinner from 'components/Spinner';
+import Postman from 'components/Postman';
 
 //Instruments
 import Styles from './styles.m.css';
 import { api, TOKEN, GROUP_ID } from 'config/api';
 import { socket } from 'socket/init';
+import { delay } from 'instruments';
 
 @withProfile
 export default class Feed extends Component {
     state = {
         posts:           [],
         isPostsFetching: false,
+        entering:        true,
     };
 
     componentDidMount() {
@@ -87,8 +92,6 @@ export default class Feed extends Component {
 
         const { data: posts } = await response.json();
 
-        console.log('-> fetched posts', posts);
-
         this.setState({
             posts,
             isPostsFetching: false,
@@ -149,10 +152,42 @@ export default class Feed extends Component {
         }));
     };
 
+    _animateComposerEnter = (composer) => {
+        fromTo(composer, 1, { opacity: 0, rotationX: 50 }, { opacity: 1, rotationX: 0 });
+    };
+
+    //version 1 -> callback func animation
+    // _animatePostmanEnter = (postman) => {
+    //     fromTo(
+    //         postman,
+    //         1,
+    //         { opacity: 0, xPercent: 100 },
+    //         {
+    //             opacity:    1,
+    //             xPercent:   0,
+    //             onComplete: async () => {
+    //                 await delay(4000);
+    //                 fromTo(postman, 1, { opacity: 1, xPercent: 0 }, { opacity: 0, xPercent: 100 });
+    //             },
+    //         },
+    //     );
+    // };
+
+    _animatePostmanEnter = async (postman) => {
+        fromTo(postman, 1, { opacity: 0, xPercent: 100 }, { opacity: 1, xPercent: 0 });
+
+        await delay(4000);
+
+        this.setState(({ entering }) => ({ entering: !entering }));
+        this._animatePostmanExit;
+    };
+
+    _animatePostmanExit = (postman) => {
+        fromTo(postman, 1, { opacity: 1, xPercent: 0 }, { opacity: 0, xPercent: 100 });
+    };
+
     render() {
         const { posts, isPostsFetching } = this.state;
-
-        console.log('-> this.state', this.state);
 
         const postsJSX = posts.map((post) => {
             return (
@@ -170,7 +205,21 @@ export default class Feed extends Component {
             <section className = { Styles.feed }>
                 <Spinner isSpinning = { isPostsFetching } />
                 <StatusBar />
-                <Composer _createPost = { this._createPost } />
+                <Transition
+                    appear
+                    in
+                    timeout = { 1000 }
+                    onEnter = { this._animateComposerEnter }>
+                    <Composer _createPost = { this._createPost } />
+                </Transition>
+                <Transition
+                    appear
+                    in = { this.state.entering }
+                    timeout = { 1000 }
+                    onEnter = { this._animatePostmanEnter }
+                    onExit = { this._animatePostmanExit }>
+                    <Postman />
+                </Transition>
                 {postsJSX}
             </section>
         );
