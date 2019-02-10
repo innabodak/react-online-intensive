@@ -75,4 +75,3 @@ export default class Composer extends Component {
         );
     }
 }
-
