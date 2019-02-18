@@ -11,6 +11,7 @@ import Composer from 'components/Composer';
 import Post from 'components/Post';
 import Spinner from 'components/Spinner';
 import Postman from 'components/Postman';
+import Counter from 'components/Counter';
 
 //Instruments
 import Styles from './styles.m.css';
@@ -156,23 +157,6 @@ export default class Feed extends Component {
         fromTo(composer, 1, { opacity: 0, rotationX: 50 }, { opacity: 1, rotationX: 0 });
     };
 
-    //version 1 -> callback func animation
-    // _animatePostmanEnter = (postman) => {
-    //     fromTo(
-    //         postman,
-    //         1,
-    //         { opacity: 0, xPercent: 100 },
-    //         {
-    //             opacity:    1,
-    //             xPercent:   0,
-    //             onComplete: async () => {
-    //                 await delay(4000);
-    //                 fromTo(postman, 1, { opacity: 1, xPercent: 0 }, { opacity: 0, xPercent: 100 });
-    //             },
-    //         },
-    //     );
-    // };
-
     _animatePostmanEnter = async (postman) => {
         fromTo(postman, 1, { opacity: 0, xPercent: 100 }, { opacity: 1, xPercent: 0 });
 
@@ -222,6 +206,7 @@ export default class Feed extends Component {
                     onEnter = { this._animateComposerEnter }>
                     <Composer _createPost = { this._createPost } />
                 </Transition>
+                <Counter count ={postsJSX.length}/>
                 <Transition
                     appear
                     in = { this.state.entering }
