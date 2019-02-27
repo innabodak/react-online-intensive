@@ -12,13 +12,13 @@ import Login from 'components/Login';
 import { Provider } from 'components/HOC/withProfile';
 
 //Instruments
-import avatar from 'theme/assets/lisa';
+// import avatar from 'theme/assets/lisa';
 
-const options = {
-    avatar,
-    currentUserFirstName: 'Инна',
-    currentUserLastName:  'Бодак',
-};
+// const options = {
+//     avatar,
+//     currentUserFirstName: 'Инна',
+//     currentUserLastName:  'Бодак',
+// };
 @hot(module)
 export default class App extends Component {
     state = {
@@ -75,37 +75,30 @@ export default class App extends Component {
 
         return (
             <Catcher>
-                <Provider value = { user }>
-                    {loggedIn ? (
-                        <>
-                            <StatusBar _handleLogOut = { this._handleLogOut } />
-                            <Switch>
-                                <Route
-                                    component = { Feed }
-                                    path = '/feed'
-                                />
-                                <Route
-                                    component = { Profile }
-                                    path = '/profile'
-                                />
-                                <Redirect to = '/feed' />
-                            </Switch>
-                        </>
-                    ) : (
+                {loggedIn ? (
+                    <Provider value = { user }>
+                        <StatusBar _handleLogOut = { this._handleLogOut } />
                         <Switch>
                             <Route
-                                path = '/login'
-                                render = { () => (
-                                    <Login
-                                        _handleLogIn = { this._handleLogIn }
-                                        { ...options }
-                                    />
-                                ) }
+                                component = { Feed }
+                                path = '/feed'
                             />
-                            <Redirect to = '/login' />
+                            <Route
+                                component = { Profile }
+                                path = '/profile'
+                            />
+                            <Redirect to = '/feed' />
                         </Switch>
-                    )}
-                </Provider>
+                    </Provider>
+                ) : (
+                    <Switch>
+                        <Route
+                            path = '/login'
+                            render = { () => <Login _handleLogIn = { this._handleLogIn } /> }
+                        />
+                        <Redirect to = '/login' />
+                    </Switch>
+                )}
             </Catcher>
         );
     }
