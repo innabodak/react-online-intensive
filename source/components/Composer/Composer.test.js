@@ -19,16 +19,14 @@ const updatedState = {
     comment,
 };
 
-const event = {
-    _preventDefault: jest.fn(),
-};
-
 const result = mount(<Composer { ...props } />);
 
 const _submitCommentSpy = jest.spyOn(result.instance(), '_submitComment');
 const _handleFormSubmitSpy = jest.spyOn(result.instance(), '_handleFormSubmit');
 const _submitOnEnterSpy = jest.spyOn(result.instance(), '_submitOnEnter');
 const _updateCommentSpy = jest.spyOn(result.instance(), '_updateComment');
+
+const _preventDefaultMock = jest.fn();
 
 describe('composer component:', () => {
     test('should have 1 "section" element', () => {
@@ -106,12 +104,30 @@ describe('composer component:', () => {
         expect(typeof result.prop('avatar')).toBe('string');
     });
 
+    test('should return null while submitted with no comment available', () => {
+        expect(result.state().comment).toBe('');
+        result.find('form').simulate('submit');
+        expect(_submitCommentSpy).toReturnWith(null);
+    });
+
     test('_submitComment class method and e.preventDefault() should be invoked when "Enter" is pressed', () => {
-        result
-            .find('textarea')
-            .simulate('keypress', { key: 'Enter', preventDefault: event._preventDefault });
+        jest.clearAllMocks();
+        result.find('textarea').simulate('keypress', {
+            key:            'Enter',
+            preventDefault: _preventDefaultMock,
+        });
         expect(_submitOnEnterSpy).toHaveBeenCalledTimes(1);
-        expect(event._preventDefault).toHaveBeenCalledTimes(1);
+        expect(_preventDefaultMock).toHaveBeenCalledTimes(1);
+    });
+
+    test('should not call _submitOnEnter if textarea element received onKeyPress event with no Enter key', () => {
+        jest.clearAllMocks();
+        result.find('textarea').simulate('keypress', {
+            key:            'L',
+            preventDefault: _preventDefaultMock,
+        });
+        expect(_submitCommentSpy).toHaveBeenCalledTimes(0);
+        expect(_preventDefaultMock).toHaveBeenCalledTimes(0);
     });
 
     test('_updateComment class method should be invoked after textarea "onChange" event', () => {
